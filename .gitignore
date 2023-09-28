@@ -1,0 +1,4 @@
+models
+.venv
+.codevenv
+__pycache__

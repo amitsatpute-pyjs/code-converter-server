@@ -1,0 +1,8 @@
+{
+    "model_path":"./models/wizardcoder-python-13b-v1.0.Q5_K_M.gguf",
+    "context_size":2048,
+    "seed": -1,
+    "temp":0,
+    "max_token":500,
+    "echo": true
+}

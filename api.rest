@@ -1,0 +1,11 @@
+POST http://127.0.0.1:5000/convert 
+content-type: application/json
+
+{
+    "lang_from": "cobol",
+    "lang_to": "python",
+    "code":"\nIDENTIFICATION DIVISION.\nPROGRAM-ID. IDSAMPLE.\nENVIRONMENT DIVISION.\nPROCEDURE DIVISION.\n    DISPLAY 'HELLO WORLD'.\n    STOP RUN.\n"
+}
+
+###
+GET http://127.0.0.1:5000/convert/38df4220-72a3-4958-9e51-bf94fc460b97
