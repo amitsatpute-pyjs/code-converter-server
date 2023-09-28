@@ -9,7 +9,7 @@ with open("./config.json", 'r') as j:
 class Model_Loader:
     def __init__(self):
         print("Loading model...")
-        self.llm = Llama(model_path="./models/wizardcoder-python-13b-v1.0.Q5_K_M.gguf",
+        self.llm = Llama(model_path=config["model_path"],
                          n_ctx=config["context_size"])
         print("Model is loaded..")
         self.result = ""
