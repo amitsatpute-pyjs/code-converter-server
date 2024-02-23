@@ -1,1 +1,1 @@
-$(pwd)/.venv/bin/python3 $(pwd)/app.py
+$(pwd)/.codevenv/bin/python3 $(pwd)/app.py

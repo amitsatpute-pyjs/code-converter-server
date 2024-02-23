@@ -1,34 +1,40 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS, cross_origin
-from celery_setup import make_celery
+import json
+from server import Server
+from flask import jsonify, request
+from flask_cors import cross_origin
 from celery.result import AsyncResult
-from model_loader import Model_Loader
-import time
+import os
+import uuid
+from dotenv import load_dotenv
 
-llm = Model_Loader()
+load_dotenv()
 
-app = Flask(__name__)
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
-app.config.update(
-    CELERY_BROKER_URL='redis://localhost:6379',
-    result_backend='redis://localhost:6379'
-)
-celery = make_celery(app)
+server = Server(__name__)
 
-@celery.task(name='app.llm')
-def get_llm(lang_from,lang_to,code):
-    obj = llm.convert_code(lang_from=lang_from, lang_to=lang_to,text=code)    
-    return obj.result
+rds = server.redis
+celery = server.celery
+app = server.app
+socket = server.socketio
+callback_api = f"http://{os.getenv('SERVER_HOST')}:{os.getenv('SERVER_PORT')}/api/callback_result"
+
+@app.route('/api/callback_result', methods=['POST'])
+def callback_result():
+    print("call back called")
+    data = request.get_json()
+    socket.emit(str(data["task_id"]), data)
+    return jsonify("done")
+
 
 @app.route('/convert', methods = ['POST'])
 @cross_origin()
 def convert():
-    body = request.json
-    s1 = time.time()   
-    task = get_llm.delay(lang_from=body["lang_from"], lang_to=body["lang_to"],code=body["code"])
-    exe_time = time.time()-s1 
+    rds_task_id = str(uuid.uuid4())
+    body = request.json    
+    kwargs = {"data": body, "callback_api": callback_api,
+              "rds_task_id": rds_task_id}
+    task = celery.send_task("tasks.llm_convert_code", kwargs=kwargs)
+    rds.set(rds_task_id, task.id)
     return jsonify({"task_id":task.id})  
 
 @app.route("/convert/<task_id>", methods=["GET"])
@@ -46,5 +52,4 @@ def get_status(task_id):
 
 
 if __name__ == '__main__':
-  
-    app.run(debug = True)
+    server.run()
