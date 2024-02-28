@@ -64,6 +64,40 @@ class Model_Loader:
             pass
         self.result = res_text
         return res_text
+    
+    def create_dockerfile(self,file_name, lang_to, text):
+        # prompt_info = f"Below is an instruction that describes a task. Write a response that appropriately completes the request without explanation, comment, doc string and information."
+        res_text = ''
+        if self.platform=="local":
+            prompt_instruction = f'''### Instruction:Create dockerfile for the following {lang_to} code without any explanation or additional information. Also consider following conditions :
+                a. Use file name as {file_name}
+                b. Install all required libraries or packages which is used in code.
+                c. Expose a port            
+            '''
+            promt_input = f"### Input:{text}"
+            prompt_result = f"### Response:"
+
+            main_prompt = prompt_instruction + promt_input + prompt_result
+            
+            output = self.llm(
+                main_prompt, max_tokens=self.max_token, echo=self.echo, temperature=self.temp)
+
+            res_text = output["choices"][0]["text"].split('### Response:')[-1]
+            if "### Output:" in res_text:
+                res_text = output["choices"][0]["text"].split('### Output:')[-1]
+        elif self.platform=="openai":
+            prompt = f'''Create dockerfile for following {lang_to} code without any explanation or additional information:
+                {text}
+            '''          
+            message = HumanMessage(
+                content=prompt
+            )
+            data = self.llm([message])
+            res_text = data.content
+        else:
+            pass
+        self.result = res_text
+        return res_text
    
     def save_code(self,file_location="./",file_name="",file_ext=".txt"):
         if not file_name:

@@ -46,21 +46,27 @@ def convert_project():
     p = Project_handler(req_data["source"],req_data["destination"],req_data["project_name"])
     p.create_folders()
     paths = p.get_all_file_paths()
-    dirs = p.get_all_folders()   
-    
+    dirs = p.get_all_folders()      
     tasks = []
-    for path  in paths:
-        body={
-            "lang_from":req_data["lang_from"],
-            "lang_to":req_data["lang_to"],
-            "source_path":req_data["source"],
-            "destination_path":req_data["destination"],
-            "file_path":path,
-            "project_name":req_data["project_name"]
-        }
+    for path in paths:       
+        body=req_data
+        body["file_path"]= path
         kwargs = {"data": body}
         task = celery.send_task("tasks.llm_direct_convert_code", kwargs=kwargs)
         tasks.append(task.id)
+        
+    return jsonify({"task_id":tasks})  
+
+@app.route('/dockerfile', methods = ['POST'])
+@cross_origin()
+def create_dockerfile():    
+    req_data = request.json    
+    tasks = []
+    
+    body=req_data       
+    kwargs = {"data": body}
+    task = celery.send_task("tasks.llm_create_dockerfile", kwargs=kwargs)
+    tasks.append(task.id)
         
     return jsonify({"task_id":tasks})  
 
