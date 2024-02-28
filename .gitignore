@@ -1,4 +1,10 @@
 models
+.env
 .venv
 .codevenv
 __pycache__
+config2.json
+testOpenAPi.py
+utils
+projects
+config.json

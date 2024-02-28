@@ -3,3 +3,9 @@ Flask
 Flask-Cors
 llama_cpp_python
 redis
+eventlet==0.35.2
+langchain==0.1.9
+langchain-community==0.0.24
+langchain-openai==0.0.7
+llama_cpp_python==0.2.6
+openai==1.12.0

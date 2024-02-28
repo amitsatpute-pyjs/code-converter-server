@@ -6,6 +6,7 @@ from celery.result import AsyncResult
 import os
 import uuid
 from dotenv import load_dotenv
+from helper.dir_tree import Project_handler
 
 load_dotenv()
 
@@ -36,6 +37,32 @@ def convert():
     task = celery.send_task("tasks.llm_convert_code", kwargs=kwargs)
     rds.set(rds_task_id, task.id)
     return jsonify({"task_id":task.id})  
+
+
+@app.route('/convertporject', methods = ['POST'])
+@cross_origin()
+def convert_project():    
+    req_data = request.json 
+    p = Project_handler(req_data["source"],req_data["destination"],req_data["project_name"])
+    p.create_folders()
+    paths = p.get_all_file_paths()
+    dirs = p.get_all_folders()   
+    
+    tasks = []
+    for path  in paths:
+        body={
+            "lang_from":req_data["lang_from"],
+            "lang_to":req_data["lang_to"],
+            "source_path":req_data["source"],
+            "destination_path":req_data["destination"],
+            "file_path":path,
+            "project_name":req_data["project_name"]
+        }
+        kwargs = {"data": body}
+        task = celery.send_task("tasks.llm_direct_convert_code", kwargs=kwargs)
+        tasks.append(task.id)
+        
+    return jsonify({"task_id":tasks})  
 
 @app.route("/convert/<task_id>", methods=["GET"])
 @cross_origin()

@@ -1,0 +1,11 @@
+{
+    "model_path":"<local model path>",
+    "context_size":2048,
+    "seed": -1,
+    "temp":0,
+    "max_token":500,
+    "echo": <true | false>,
+    "platform":"<openai | local>",
+    "openai_api_version":"<version>",
+    "azure_deployment":"<deployment-name>" 
+}

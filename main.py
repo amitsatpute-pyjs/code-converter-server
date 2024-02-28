@@ -33,7 +33,7 @@ PERFORM UNTIL WS-LIMIT<1
 END-PERFORM
 STOP RUN.
 """
-# avg time: 37sec
+# avg time: 37sec 32ram 8cr
 qq = """
 IDENTIFICATION DIVISION.
 PROGRAM-ID. IDSAMPLE.
