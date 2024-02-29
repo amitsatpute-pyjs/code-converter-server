@@ -9,3 +9,28 @@ content-type: application/json
 
 ###
 GET http://127.0.0.1:5000/convert/38df4220-72a3-4958-9e51-bf94fc460b97
+
+###
+POST http://127.0.0.1:5000/convertporject 
+content-type: application/json
+
+{
+    "lang_from":"cobol",
+    "lang_to":"python",
+    "source" :"<cobol project path>",
+    "destination": "<folder path - where to save converted code>",
+    "project_name" : "<name of the project>"
+   
+}
+
+###
+POST http://127.0.0.1:5000/dockerfile 
+content-type: application/json
+
+
+{
+    "lang":"python",  
+    "destination": "<converted project path>",
+    "project_name" : "<name of the project folder>",
+    "app_file_path":"<file name eg. main.py - which contains entrypoint of the project>"
+}
